@@ -61,7 +61,7 @@ enum Outcome {
 }
 
 impl Outcome {
-    fn from_round(round: &Round) -> Outcome {
+    fn from_round(round: Round) -> Outcome {
         if round.opponent.beats(&round.player) {
             Outcome::Loss
         } else if round.player.beats(&round.opponent) {
@@ -81,15 +81,13 @@ impl Outcome {
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let mut total_score = 0;
+    let total_score = input
+        .lines()
+        .map(Round::from_line)
+        .map(|r| (r.player, Outcome::from_round(r)))
+        .map(|(player, outcome)| player.as_score() + outcome.as_score())
+        .sum();
 
-    let rounds = input.lines();
-    for round in rounds {
-        let round = Round::from_line(round);
-        let outcome = Outcome::from_round(&round);
-        let score = round.player.as_score() + outcome.as_score();
-        total_score += score;
-    }
 
     Some(total_score)
 }
